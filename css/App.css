@@ -1,0 +1,93 @@
+
+/* Reset for darker look */
+:root {
+  --bg-main: #07080a;
+  color-scheme: dark
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+/* 
+  Modern Minimalist Floating Scrollbar
+  Designed for Dark Theme
+*/
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;  /* Wider interaction area */
+  height: 12px; /* Wider interaction area */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15); /* Subtle visible grey */
+  border-radius: 999px; /* Pill shape */
+  
+  /* The "Floating" Trick: 
+     Border is transparent, background is clipped to content-box.
+     This makes the effective visual width = (12px width - 3px left border - 3px right border) = 6px
+  */
+  border: 3px solid transparent;
+  background-clip: content-box;
+  
+  transition: background-color 0.2s ease, border-width 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.35); /* Brighter on hover */
+  border: 2px solid transparent; /* Slightly wider visually on hover */
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.5); /* Even brighter on click */
+  border: 2px solid transparent;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Maintain no-scrollbar as an optional utility if needed for specific areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Professional Gray-White Checkerboard Patterns */
+.checkerboard-pattern-lg {
+  background-color: #ffffff;
+  background-image: conic-gradient(
+    #f0f0f0 0.25turn, 
+    transparent 0.25turn 0.5turn, 
+    #f0f0f0 0.5turn 0.75turn, 
+    transparent 0.75turn
+  );
+  background-size: 20px 20px;
+}
+
+.checkerboard-pattern-sm {
+  background-color: #ffffff;
+  background-image: conic-gradient(
+    #f0f0f0 0.25turn, 
+    transparent 0.25turn 0.5turn, 
+    #f0f0f0 0.5turn 0.75turn, 
+    transparent 0.75turn
+  );
+  background-size: 8px 8px;
+}
+
+canvas {
+  filter: drop-shadow(0 40px 100px rgba(0,0,0,0.8));
+}

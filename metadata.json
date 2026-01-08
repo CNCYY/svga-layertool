@@ -1,0 +1,5 @@
+{
+  "name": "SVGA Layer Master",
+  "description": "A professional SVGA file inspector and layer replacement tool. Upload SVGA animations, view all internal image layers, and dynamically replace them with your own images for real-time previewing.",
+  "requestFramePermissions": []
+}

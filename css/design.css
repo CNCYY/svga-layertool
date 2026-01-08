@@ -1,0 +1,51 @@
+:root {
+  /* Color Palette */
+  --bg-main: #07080a;
+  --bg-surface: #0f1115;
+  --bg-surface-elevated: #16191f;
+  
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+
+  --neon-primary: #6366f1;
+  --neon-secondary: #818cf8;
+  --neon-glow: rgba(99, 102, 241, 0.3);
+  
+  --success: #10b981;
+  --error: #ef4444;
+
+  /* Glassmorphism Defaults */
+  --glass-bg: rgba(15, 17, 21, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+/* Global Transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 200ms;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--zinc-100);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.text-neon-gradient {
+  background: linear-gradient(to right, var(--neon-primary), var(--neon-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-neon-primary {
+  background-color: var(--neon-primary);
+}
