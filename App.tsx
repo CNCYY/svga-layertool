@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const [fileSize, setFileSize] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [canvasBg, setCanvasBg] = useState<'transparent' | 'white' | 'black' | 'green'>('transparent');
+  const [canvasBg, setCanvasBg] = useState<'transparent' | 'white' | 'black' | 'green'>('black');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Debug States
