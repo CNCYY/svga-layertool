@@ -82,7 +82,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
             className={`relative rounded-[40px] transition-all duration-700 overflow-hidden ${canvasBg === 'transparent' ? 'checkerboard-pattern-lg' : ''}`}
             style={canvasBg !== 'transparent' ? { backgroundColor: canvasBg } : {}}
           >
-            <div ref={containerRef} className="max-w-[80vw] max-h-[60vh] drop-shadow-[0_40px_100px_rgba(0,0,0,0.6)]" />
+            <div ref={containerRef} className="max-w-[80vw] max-h-[60vh]" />
           </div>
         </div>
       )}
