@@ -27,6 +27,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [canvasBg, setCanvasBg] = useState<'transparent' | 'white' | 'black' | 'green'>('black');
+  const [layerThumbBg, setLayerThumbBg] = useState<'transparent' | 'black'>('transparent');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Debug States
@@ -40,9 +41,7 @@ const App: React.FC = () => {
 
   // Sync Player with Video Item
   useEffect(() => {
-    // Only initialize if we have a video item, a container, and we're not currently parsing a new file
     if (videoItem && containerRef.current && window.SVGA && !loading) {
-      // To prevent issues with container re-mounting, we always create a fresh player instance for the new video item
       if (playerRef.current) {
         playerRef.current.stopAnimation();
         playerRef.current.clear();
@@ -56,7 +55,6 @@ const App: React.FC = () => {
       playerRef.current = player;
       setIsPlaying(true);
 
-      // Cleanup on unmount or dependency change
       return () => {
         if (player) {
           player.stopAnimation();
@@ -91,27 +89,32 @@ const App: React.FC = () => {
   }, []);
 
   // Handlers
-  const onFileProcess = async (file: File) => {
-    setLoading(true);
-    setError(null);
-    setFileName(file.name);
-    setFileSize(file.size);
-    setExportSuccess(false);
-    setExportLog([]); // Clear previous export log on new file
-    setSelectedLayerKeys(new Set()); // Reset selection
-    
-    // Reset player ref immediately
+  const clearAll = () => {
     if (playerRef.current) {
       playerRef.current.stopAnimation();
       playerRef.current.clear();
       playerRef.current = null;
     }
+    setVideoItem(null);
+    setLayers([]);
+    setSelectedLayerKeys(new Set());
+    setFileName('');
+    setFileSize(0);
+    setImportLog([]);
+    setExportLog([]);
+    setSearchQuery('');
+    setError(null);
+  };
+
+  const onFileProcess = async (file: File) => {
+    clearAll(); // Ensure we start fresh
+    setLoading(true);
+    setFileName(file.name);
+    setFileSize(file.size);
 
     try {
       const buffer = await file.arrayBuffer();
       const item = await loadSvgaFile(buffer);
-      
-      // DEBUG: Extract info from imported file
       setImportLog(extractDebugInfo(item));
 
       const images = item.images || {};
@@ -173,8 +176,6 @@ const App: React.FC = () => {
     });
   };
 
-  // --- Selection Handlers ---
-
   const onSelectLayer = (key: string) => {
     setSelectedLayerKeys(prev => {
       const next = new Set(prev);
@@ -185,26 +186,18 @@ const App: React.FC = () => {
   };
 
   const onSelectAll = (filteredKeys: string[]) => {
-    // If all filtered keys are already selected, deselect them. Otherwise, select them all.
     const allSelected = filteredKeys.every(k => selectedLayerKeys.has(k));
-    
     setSelectedLayerKeys(prev => {
       const next = new Set(prev);
-      if (allSelected) {
-        filteredKeys.forEach(k => next.delete(k));
-      } else {
-        filteredKeys.forEach(k => next.add(k));
-      }
+      if (allSelected) filteredKeys.forEach(k => next.delete(k));
+      else filteredKeys.forEach(k => next.add(k));
       return next;
     });
   };
 
-  // --- Layer Operation Handlers (with Batch Logic) ---
-
   const onLayerReplace = async (key: string, file: File) => {
     const layer = layers.find(l => l.key === key);
     if (!layer) return;
-
     try {
       const processedBase64 = await resizeImage(file, layer.width, layer.height);
       setLayers(prev => prev.map(l => l.key === key ? { ...l, replacedData: processedBase64, isDeleted: false } : l));
@@ -222,18 +215,12 @@ const App: React.FC = () => {
     setLayers(prev => {
       const targetLayer = prev.find(p => p.key === key);
       if (!targetLayer) return prev;
-      
-      // The intended state is the opposite of the clicked layer's current state
       const nextState = !targetLayer.isDeleted;
       const isBatch = selectedLayerKeys.has(key);
-
       return prev.map(l => {
-        // Apply if this is the target layer OR (batch mode is active AND this layer is selected)
         if (l.key === key || (isBatch && selectedLayerKeys.has(l.key))) {
-          // Side Effect: Update Player Visuals
           const data = nextState ? TRANSPARENT_PIXEL : (l.replacedData || l.originalData);
           playerRef.current?.setImage(data.startsWith('data:') ? data : `data:image/png;base64,${data}`, l.key);
-          
           return { ...l, isDeleted: nextState };
         }
         return l;
@@ -243,13 +230,10 @@ const App: React.FC = () => {
 
   const onLayerReset = (key: string) => {
     const isBatch = selectedLayerKeys.has(key);
-
     setLayers(prev => prev.map(l => {
       if (l.key === key || (isBatch && selectedLayerKeys.has(l.key))) {
-        // Side Effect: Update Player
         const original = l.originalData.startsWith('data:') ? l.originalData : `data:image/png;base64,${l.originalData}`;
         playerRef.current?.setImage(original, l.key);
-
         return { ...l, replacedData: undefined, isDeleted: false };
       }
       return l;
@@ -264,7 +248,6 @@ const App: React.FC = () => {
       const data = await exportModifiedSvga(videoItem, layers);
       const blob = new Blob([data], { type: "application/octet-stream" });
       const arrayBuffer = await blob.arrayBuffer();
-      
       const newItem = await loadSvgaFile(arrayBuffer);
       setExportLog(extractDebugInfo(newItem));
 
@@ -289,8 +272,6 @@ const App: React.FC = () => {
     }
   };
 
-  // --- Thumbnail Handlers ---
-
   const handleSeekFrame = (frame: number) => {
     if (playerRef.current) {
         setIsPlaying(false);
@@ -306,7 +287,6 @@ const App: React.FC = () => {
         setError("Could not capture frame. Canvas not found.");
         return;
     }
-    
     try {
         const dataUrl = canvas.toDataURL("image/png");
         const a = document.createElement("a");
@@ -337,6 +317,7 @@ const App: React.FC = () => {
         exportSuccess={exportSuccess} 
         onExport={() => handleRenderPreview(true)}
         onNewUpload={triggerFileUpload}
+        onClear={clearAll}
         onSeekFrame={handleSeekFrame}
         onExtractThumbnail={handleDownloadThumbnail}
       />
@@ -347,11 +328,12 @@ const App: React.FC = () => {
           searchQuery={searchQuery} 
           setSearchQuery={setSearchQuery} 
           loading={loading}
+          layerThumbBg={layerThumbBg}
+          setLayerThumbBg={setLayerThumbBg}
           onReplace={onLayerReplace}
           onRename={onLayerRename}
           onToggleHide={onToggleLayerHide}
           onReset={onLayerReset}
-          // Selection Props
           selectedLayerKeys={selectedLayerKeys}
           onSelectLayer={onSelectLayer}
           onSelectAll={onSelectAll}

@@ -6,6 +6,7 @@ import { TRANSPARENT_PIXEL } from '../constants';
 
 interface LayerCardProps {
   layer: LayerReplacement;
+  thumbBg: 'transparent' | 'black';
   onReplace: (key: string, file: File) => void;
   onRename: (key: string, newName: string) => void;
   onToggleHide: (key: string) => void;
@@ -15,7 +16,7 @@ interface LayerCardProps {
 }
 
 export const LayerCard: React.FC<LayerCardProps> = ({ 
-    layer, onReplace, onRename, onToggleHide, onReset, isSelected, onSelect 
+    layer, thumbBg, onReplace, onRename, onToggleHide, onReset, isSelected, onSelect 
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(layer.displayName);
@@ -68,7 +69,7 @@ export const LayerCard: React.FC<LayerCardProps> = ({
 
         {/* Thumbnail */}
         <div 
-          className="w-14 h-14 rounded-xl checkerboard-pattern-sm border border-white/5 flex items-center justify-center overflow-hidden cursor-pointer relative shadow-inner group-hover:border-white/10 transition-all shrink-0"
+          className={`w-14 h-14 rounded-xl border border-white/5 flex items-center justify-center overflow-hidden cursor-pointer relative shadow-inner group-hover:border-white/10 transition-all shrink-0 ${thumbBg === 'transparent' ? 'checkerboard-pattern-sm' : 'bg-black'}`}
           onClick={() => !layer.isDeleted && document.getElementById(`f-${layer.key}`)?.click()}
         >
           <img src={formatImg(layer.replacedData || layer.originalData)} className="max-w-[75%] max-h-[75%] object-contain drop-shadow-lg" />

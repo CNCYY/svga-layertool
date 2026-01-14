@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, CheckSquare, Square } from 'lucide-react';
+import { Search, CheckSquare, Square, Grid } from 'lucide-react';
 import { LayerReplacement } from '../types';
 import { LayerCard } from './LayerCard';
 
@@ -9,24 +9,24 @@ interface SidebarProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   loading: boolean;
+  layerThumbBg: 'transparent' | 'black';
+  setLayerThumbBg: (bg: 'transparent' | 'black') => void;
   onReplace: (key: string, file: File) => void;
   onRename: (key: string, newName: string) => void;
   onToggleHide: (key: string) => void;
   onReset: (key: string) => void;
-  // Selection
   selectedLayerKeys: Set<string>;
   onSelectLayer: (key: string) => void;
   onSelectAll: (filteredKeys: string[]) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
-  layers, searchQuery, setSearchQuery, loading, onReplace, onRename, onToggleHide, onReset, 
+  layers, searchQuery, setSearchQuery, loading, layerThumbBg, setLayerThumbBg, onReplace, onRename, onToggleHide, onReset, 
   selectedLayerKeys, onSelectLayer, onSelectAll
 }) => {
   const filteredLayers = layers.filter(l => l.displayName.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredKeys = filteredLayers.map(l => l.key);
 
-  // Check if all filtered layers are selected (for UI state)
   const isAllSelected = filteredLayers.length > 0 && filteredLayers.every(l => selectedLayerKeys.has(l.key));
 
   return (
@@ -45,7 +45,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Stats Row & Select All */}
         <div className="flex items-center justify-between mb-4 px-1">
             <div 
                 className="flex items-center gap-2 cursor-pointer group"
@@ -61,8 +60,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
             </div>
 
-            <div className="shrink-0 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black px-3 py-1.5 rounded-lg tracking-tighter">
-                {selectedLayerKeys.size > 0 ? `${selectedLayerKeys.size} SELECTED` : `${layers.length} ASSETS`}
+            <div className="flex items-center gap-3">
+                {/* Background Toggle for Layer Thumbs */}
+                <div className="flex items-center bg-white/5 border border-white/5 rounded-lg p-0.5">
+                    <button 
+                        onClick={() => setLayerThumbBg('transparent')}
+                        className={`p-1 rounded transition-all ${layerThumbBg === 'transparent' ? 'bg-white/10 text-indigo-400' : 'text-zinc-600 hover:text-zinc-400'}`}
+                        title="Transparent Background"
+                    >
+                        <Grid size={12} />
+                    </button>
+                    <button 
+                        onClick={() => setLayerThumbBg('black')}
+                        className={`p-1 rounded transition-all ${layerThumbBg === 'black' ? 'bg-white/10 text-indigo-400' : 'text-zinc-600 hover:text-zinc-400'}`}
+                        title="Black Background"
+                    >
+                        <Square size={12} fill={layerThumbBg === 'black' ? 'currentColor' : 'none'} />
+                    </button>
+                </div>
+
+                <div className="shrink-0 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black px-3 py-1.5 rounded-lg tracking-tighter">
+                    {selectedLayerKeys.size > 0 ? `${selectedLayerKeys.size} SELECTED` : `${layers.length} ASSETS`}
+                </div>
             </div>
         </div>
       </div>
@@ -81,11 +100,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <LayerCard 
               layer={layer} 
+              thumbBg={layerThumbBg}
               onReplace={onReplace} 
               onRename={onRename}
               onToggleHide={onToggleHide} 
+              // Fixed: Using the destructured prop name 'onReset' instead of undefined 'onLayerReset'
               onReset={onReset} 
-              // Selection
               isSelected={selectedLayerKeys.has(layer.key)}
               onSelect={() => onSelectLayer(layer.key)}
             />
