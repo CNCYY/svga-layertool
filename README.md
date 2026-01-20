@@ -1,20 +1,15 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# svga图层编辑器
+> 方便运营在工作过程中对svga进行增值操作，不再被动等待排期，让设计能专注创作工作，减少繁琐杂事
 
-# Run and deploy your AI Studio app
+### 编辑功能
+1. 删除
+2. 替换/上传--点击图层区域上传图片
+3. 重命名--点击图层命名修改图层名字
 
-This contains everything you need to run your app locally.
+### 导出功能
+1. 导出svga
+2. 导出png缩略图--拖动进度条选择任意一帧进行导出
 
-View your app in AI Studio: https://ai.studio/apps/drive/1QIiaHRZex0CNjVVwFds4FRBdEoYcNdyj
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 附加功能
+1. 搜索图层名字
+2. 批量隐藏图层
